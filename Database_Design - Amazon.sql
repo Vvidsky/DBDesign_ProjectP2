@@ -54,7 +54,7 @@ CREATE TABLE User(
 );
 
 CREATE TABLE User_address(
-	user_address_id	int,
+	user_address_id	int PRIMARY KEY,
     first_name		varchar(255),
     last_name		varchar(255),
     street			varchar(255),
@@ -118,4 +118,20 @@ CREATE TABLE Review_image(
     PRIMARY KEY (review_id, review_image),
     CONSTRAINT fk_review_image_review_id FOREIGN KEY (review_id) REFERENCES Review(review_id) 
 );
+
+CREATE TABLE `Order`(
+	order_item_id	int,
+    order_detail_id	int,
+	user_address_id	int,
+    product_id		int,
+    user_id			int,
+	
+    PRIMARY KEY (order_item_id, order_detail_id),
+	CONSTRAINT fk_order_order_item_id FOREIGN KEY (order_item_id) REFERENCES Order_item(order_item_id), 
+    CONSTRAINT fk_order_order_detail_id FOREIGN KEY (order_detail_id) REFERENCES Order_detail(order_detail_id),
+    CONSTRAINT fk_order_user_address_id FOREIGN KEY (user_address_id) REFERENCES User_address(user_address_id),
+    CONSTRAINT fk_order_product_id FOREIGN KEY (product_id) REFERENCES Product(product_id), 
+    CONSTRAINT fk_order_user_id FOREIGN KEY (user_id) REFERENCES `User`(user_id) 
+);
+
 

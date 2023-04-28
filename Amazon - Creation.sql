@@ -7,7 +7,7 @@ CREATE TABLE `Product` (
     product_name 			varchar(255),
     product_description 	text, 
     product_thumbnail		varchar(255),
-    price					decimal,
+    price					decimal(10,2),
     discount				int,
     brand					varchar(255),
     dimension				varchar(255),
@@ -16,9 +16,9 @@ CREATE TABLE `Product` (
 );
 
 CREATE TABLE `Product_vendor`(
-	vendor_id	int PRIMARY KEY,
-    vendor_name	varchar(255),
-    vendor_description varchar(255),
+	vendor_id			int PRIMARY KEY,
+    vendor_name			varchar(255),
+    vendor_description 	text,
     business_domain		varchar(255),
     thumbnail_profile	varchar(255),
     email				varchar(255),
@@ -92,8 +92,8 @@ CREATE TABLE `Order_detail`(
     estimated_delivery_date	date,
     receive_date			date,
     comment					text,
-	shipping_fee			decimal,
-    tax_rate				decimal,
+	shipping_fee			decimal(10,2),
+    tax_rate				decimal(10,2),
     user_id					int,
 	payment_method_id		int,
     CONSTRAINT chk_order_detail_tax_rate CHECK (tax_rate BETWEEN 7.5 AND 15),
@@ -137,7 +137,6 @@ CREATE TABLE `Order`(
 CREATE TABLE `Cart`(
 	cart_id		int NOT NULL PRIMARY KEY,
     modified_at	datetime,
-    deleted_at	datetime,
     user_id		int,
 	CONSTRAINT fk_cart_user_id FOREIGN KEY(user_id) REFERENCES `User`(user_id)
 );

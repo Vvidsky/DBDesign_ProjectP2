@@ -2,7 +2,7 @@ DROP DATABASE IF EXISTS Amazon;
 CREATE DATABASE Amazon;
 USE Amazon;
 
-CREATE TABLE Product (
+CREATE TABLE `Product` (
 	product_id 				int PRIMARY KEY,
     product_name 			varchar(255),
     product_description 	text, 
@@ -15,7 +15,7 @@ CREATE TABLE Product (
     modified_at				datetime
 );
 
-CREATE TABLE Product_vendor(
+CREATE TABLE `Product_vendor`(
 	vendor_id	int PRIMARY KEY,
     vendor_name	varchar(255),
     vendor_description varchar(255),
@@ -26,7 +26,7 @@ CREATE TABLE Product_vendor(
     is_verified			bool
 );
 
-CREATE TABLE Vendor_address(
+CREATE TABLE `Vendor_address`(
 	vendor_address_id int PRIMARY KEY,
     first_name	varchar(255),
     last_name  varchar(255),
@@ -39,7 +39,7 @@ CREATE TABLE Vendor_address(
     FOREIGN KEY (vendor_id) REFERENCES Product_vendor(vendor_id)
 );
 
-CREATE TABLE User(
+CREATE TABLE `User`(
 	user_id 		int PRIMARY KEY,
     first_name 		varchar(255),
     last_name		varchar(255),
@@ -53,7 +53,7 @@ CREATE TABLE User(
     birthdate		date
 );
 
-CREATE TABLE User_address(
+CREATE TABLE `User_address`(
 	user_address_id	int PRIMARY KEY,
     first_name		varchar(255),
     last_name		varchar(255),
@@ -66,7 +66,7 @@ CREATE TABLE User_address(
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
-CREATE TABLE Payment_method(
+CREATE TABLE `Payment_method`(
 	payment_method_id	int,
     payment_method_name	varchar(255),
     credit_card			varchar(19),		# Maximum number of card number length
@@ -75,7 +75,7 @@ CREATE TABLE Payment_method(
     CONSTRAINT fk_payment_method_user_user_id FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
-CREATE TABLE Order_item(
+CREATE TABLE `Order_item`(
 	order_item_id	int PRIMARY KEY,
     quantity		int,
     price_each		double,
@@ -83,7 +83,7 @@ CREATE TABLE Order_item(
     modified_at		datetime
 );
 
-CREATE TABLE Order_detail(
+CREATE TABLE `Order_detail`(
 	order_detail_id			int PRIMARY KEY,
     transaction_status		varchar(20),
     created_at				datetime,
@@ -100,7 +100,7 @@ CREATE TABLE Order_detail(
     CONSTRAINT chk_order_detail_transaction_status CHECK (transaction_status IN ('Completed', 'Pending', 'Canceled'))
 );
 
-CREATE TABLE Review(
+CREATE TABLE `Review`(
 	review_id		 	int PRIMARY KEY,
     rating_star			tinyint,
     comment				text,
@@ -112,7 +112,7 @@ CREATE TABLE Review(
     CONSTRAINT fk_revice_user_user_id FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
-CREATE TABLE Review_image(
+CREATE TABLE `Review_image`(
 	review_id		int,
     review_image	varchar(255),
     PRIMARY KEY (review_id, review_image),
@@ -132,6 +132,24 @@ CREATE TABLE `Order`(
     CONSTRAINT fk_order_user_address_id FOREIGN KEY (user_address_id) REFERENCES User_address(user_address_id),
     CONSTRAINT fk_order_product_id FOREIGN KEY (product_id) REFERENCES Product(product_id), 
     CONSTRAINT fk_order_user_id FOREIGN KEY (user_id) REFERENCES `User`(user_id) 
+);
+
+CREATE TABLE `Cart`(
+	cart_id		int NOT NULL PRIMARY KEY,
+    modified_at	datetime,
+    deleted_at	datetime,
+    user_id		int,
+	CONSTRAINT fk_cart_user_id FOREIGN KEY(user_id) REFERENCES `User`(user_id)
+);
+
+CREATE TABLE `Product_cart_map` (
+	product_id	int,
+    cart_id		int,
+    quantity	int,
+    
+    PRIMARY KEY(product_id, cart_id),
+    CONSTRAINT fk_product_cart_map_product_id FOREIGN KEY (product_id) REFERENCES Product(product_id),
+    CONSTRAINT fk_product_cart_map_cart_id FOREIGN KEY (cart_id) REFERENCES Cart(cart_id)
 );
 
 

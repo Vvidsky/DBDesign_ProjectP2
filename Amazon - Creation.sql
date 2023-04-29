@@ -17,7 +17,7 @@ CREATE TABLE `Product` (
 
 CREATE TABLE `Product_vendor`(
 	vendor_id			int PRIMARY KEY,
-    vendor_name			varchar(255),
+    vendor_name			varchar(255) UNIQUE,
     vendor_description 	text,
     business_domain		varchar(255),
     thumbnail_profile	varchar(255),
@@ -96,8 +96,7 @@ CREATE TABLE `Order_detail`(
     tax_rate				decimal(10,2),
     user_id					int,
 	payment_method_id		int,
-    CONSTRAINT chk_order_detail_tax_rate CHECK (tax_rate BETWEEN 7.5 AND 15),
-    CONSTRAINT chk_order_detail_transaction_status CHECK (transaction_status IN ('Completed', 'Pending', 'Canceled'))
+    CONSTRAINT chk_order_detail_transaction_status CHECK (transaction_status IN ('Completed', 'Ongoing', 'Failed'))
 );
 
 CREATE TABLE `Review`(

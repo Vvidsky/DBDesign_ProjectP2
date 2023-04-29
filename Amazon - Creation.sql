@@ -150,4 +150,42 @@ CREATE TABLE `Product_cart_map` (
     CONSTRAINT fk_product_cart_map_cart_id FOREIGN KEY (cart_id) REFERENCES Cart(cart_id)
 );
 
+CREATE TABLE `Product_department` (
+	department_id	int PRIMARY KEY,
+    department_name	VARCHAR(255) NOT NULL UNIQUE,
+    created_at		datetime
+);
+
+CREATE TABLE `product_department_map` (
+	product_id		int,
+    department_id	int,
+    
+    PRIMARY KEY (product_id, department_id),
+    CONSTRAINT fk_product_department_map_product_id FOREIGN KEY (product_id) REFERENCES Product(product_id),
+    CONSTRAINT fk_product_department_map_department_id FOREIGN KEY (department_id) REFERENCES Product_department(department_id)
+);
+
+CREATE TABLE `Product_sub_category` (
+	sub_category_id				int PRIMARY KEY,
+    sub_category_name			VARCHAR(255),
+    sub_category_description	VARCHAR(255),
+    created_at					datetime,
+    modified_at					datetime,
+    department_id				int,
+		
+	CONSTRAINT fk_product_sub_category_department_id FOREIGN KEY (department_id) REFERENCES Product_department(department_id)
+);
+
+CREATE TABLE `product_sub_category_map` (
+	product_id		int,
+    sub_category_id	int,
+    
+    PRIMARY KEY (product_id, sub_category_id),
+    CONSTRAINT fk_product_sub_category_map_product_id FOREIGN KEY (product_id) REFERENCES Product(product_id),
+    CONSTRAINT fk_product_sub_category_map_sub_category_id_id FOREIGN KEY (sub_category_id) REFERENCES Product_sub_category(sub_category_id)
+);
+
+
+
+
 

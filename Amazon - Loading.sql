@@ -71,6 +71,34 @@ LOAD DATA
 	IGNORE 1 LINES;
 SELECT * FROM order_detail;
 
+LOAD DATA 
+	INFILE "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/review.csv" INTO TABLE review
+	FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+	LINES TERMINATED BY '\r\n'
+	IGNORE 1 LINES;
+SELECT * FROM review;
+
+LOAD DATA 
+	INFILE "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/review_image.csv" INTO TABLE review_image
+	FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+	LINES TERMINATED BY '\r\n'
+	IGNORE 1 LINES;
+SELECT * FROM review_image;
+
+LOAD DATA 
+	INFILE "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/product_department.csv" INTO TABLE product_department
+	FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+	LINES TERMINATED BY '\r\n'
+	IGNORE 1 LINES;
+SELECT * FROM product_department;
+
+LOAD DATA 
+	INFILE "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/product_sub_category.csv" INTO TABLE product_sub_category
+	FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+	LINES TERMINATED BY '\r\n'
+	IGNORE 1 LINES;
+SELECT * FROM product_sub_category;
+
 
 
 

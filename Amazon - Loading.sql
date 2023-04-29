@@ -93,11 +93,25 @@ LOAD DATA
 SELECT * FROM product_department;
 
 LOAD DATA 
+	INFILE "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/product_department_map.csv" INTO TABLE product_department_map
+	FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+	LINES TERMINATED BY '\r\n'
+	IGNORE 1 LINES;
+SELECT * FROM product_department_map;
+
+LOAD DATA 
 	INFILE "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/product_sub_category.csv" INTO TABLE product_sub_category
 	FIELDS TERMINATED BY ',' ENCLOSED BY '"'
 	LINES TERMINATED BY '\r\n'
 	IGNORE 1 LINES;
 SELECT * FROM product_sub_category;
+
+LOAD DATA 
+	INFILE "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/product_sub_category_map.csv" INTO TABLE product_sub_category_map
+	FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+	LINES TERMINATED BY '\r\n'
+	IGNORE 1 LINES;
+SELECT * FROM product_sub_category_map;
 
 
 

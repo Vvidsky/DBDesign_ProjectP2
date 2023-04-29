@@ -1,6 +1,6 @@
 sub_category_id,sub_category_name,sub_category_description,created_at,modified_at,department_id
-1,Air Conditioners,"""The air conditioner category includes devices used for cooling and dehumidifying indoor air.""",2020-01-17 23:26:10,2016-04-25 22:05:42,1
-2,Home Audio & Theater,"""Consumer electronics designed for audio and visual entertainment in a home setting.""",2017-06-15 02:55:23,2017-03-16 12:09:51,2
-3,Travel Accessories,"""Products designed to help travelers stay organized, comfortable, and secure during their journeys.""",2019-11-15 10:14:43,2018-02-25 13:13:06,3
-4,Shirts,"""Elevate your wardrobe with our collection of premium shirts, designed to fit your unique style and personality.""",2020-09-16 11:32:15,2020-11-07 09:53:28,4
-5,Furniture,"""Upgrade your living space with our premium selection of furniture pieces designed for both style and comfort.""",2019-06-17 16:16:35,2016-11-08 05:04:41,5
+1,Air Conditioners,The air conditioner category includes devices used for cooling and dehumidifying indoor air.,2017-04-11 11:09:38,2018-12-06 12:55:17,1
+2,Home Audio & Theater,Consumer electronics designed for audio and visual entertainment in a home setting.,2017-10-06 13:37:54,2016-11-27 08:22:28,2
+3,Travel Accessories,"Products designed to help travelers stay organized, comfortable, and secure during their journeys.",2020-11-24 21:03:49,2019-06-05 22:01:56,3
+4,Shirts,"Elevate your wardrobe with our collection of premium shirts, designed to fit your unique style and personality.",2020-12-06 17:35:49,2017-01-02 13:57:29,4
+5,Furniture,Upgrade your living space with our premium selection of furniture pieces designed for both style and comfort.,2020-08-13 20:05:25,2018-06-29 12:55:53,5

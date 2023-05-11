@@ -13,24 +13,17 @@ LIMIT 10000;
 
 SELECT * FROM product_list LIMIT 10000;
 
--- 1.2 Create/Edit/Delete the review description and image of each product
+-- 1.2 Create/Edit/Delete the products
 
--- 1.3 Register
+-- 1.3 Create/Edit/Delete the review description and image of each product
 
--- 1.4 Login
+-- 1.4 Delete the product
 
--- 1.5 See the order history of each customer
-
--- 1.6 Add product to the cart
-
--- 1.7 Process the payment
-
+-- 1.5 Delete the review
 
 /*-----------------------
-|	   	  Vendor	    |
+|	   	  User		    |
 -------------------------*/
--- 2.1 1.2 Create/Edit/Delete the products
-
 -- 2.1 Register
 
 -- 2.2 Login
@@ -38,11 +31,11 @@ SELECT * FROM product_list LIMIT 10000;
 -- 2.3 See the order history of each customer
 
 /*-----------------------
-|	   	  Staff	    	|
+|	   	 Shopping    	|
 -------------------------*/
--- 3.1 Delete the product
+-- 3.1 Add product to the cart
 
--- 3.2 Delete the review
+-- 3.2 Process the payment
 
 
 

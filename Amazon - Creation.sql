@@ -45,7 +45,7 @@ CREATE TABLE `User`(
     first_name 		varchar(255) NOT NULL,
     last_name		varchar(255) NOT NULL,
     is_prime_member	bool,
-    email			varchar(255) UNIQUE NOT NULL,
+    email			varchar(255) NOT NULL,
     password		varchar(255),
     created_at		datetime,
     modified_at		datetime,

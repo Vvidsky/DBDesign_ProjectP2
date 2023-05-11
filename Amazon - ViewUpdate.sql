@@ -44,7 +44,10 @@ CALL register_user('Nobi', 'Nobita', 'nobi.nobi@gmail.com', 'atibon888!');
 SELECT * FROM user;
 
 -- 2.2 Login
-
+-- Correct Login
+SELECT * FROM USER WHERE email = "arel.Gomer@hotmail.com" AND password = "JxQ0G3j";
+-- Incorrect password
+SELECT * FROM USER WHERE email = "arel.Gomer@hotmail.com" AND password = "abcdef";
 
 -- 2.3 See the order history of each customer
 SELECT * FROM order_history WHERE transaction_status = "Ongoing";

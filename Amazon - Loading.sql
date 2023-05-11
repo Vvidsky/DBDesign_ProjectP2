@@ -113,6 +113,13 @@ LOAD DATA
 	IGNORE 1 LINES;
 SELECT * FROM product_sub_category_map;
 
+LOAD DATA 
+	INFILE "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/order.csv" INTO TABLE `order`
+	FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+	LINES TERMINATED BY '\r\n'
+	IGNORE 1 LINES;
+SELECT * FROM `order`;
+
 
 
 

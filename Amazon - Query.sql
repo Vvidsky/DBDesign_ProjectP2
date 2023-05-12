@@ -282,28 +282,29 @@ GROUP BY od.transaction_status
 ORDER BY transaction_status;
 
 
-/*-----------------------
-|	   	 Shopping    	|
--------------------------*/
--- 3.1 Add product to the cart
+-- ========================================================================================================= --
+/* 3.1.1 Assuming that you logged in as “Lori Hunt” (or user id 492), and you want to add product id 95 or
+“Hitachi SPLIT AC - 1.0 Ton HITACHI SHIZEN 3100S INVERTER - R32 - RAPG312HFEOZ1 (Gold)” to his cart for 99 items.
+*/
+INSERT INTO product_cart_map
+VALUES(95, 492, 99);
+/* 
 
--- 3.2.1 Assuming that you logged in as “Lori Hunt”, and you want to process the payment of all products in his cart. Note that the result should show the product_name, quantity ordered, and price (each).
-SELECT p.product_name, pm.quantity, p.standard_price
-FROM product p
-JOIN product_cart_map pm ON p.product_id = pm.product_id
-JOIN cart c ON c.cart_id = pm.cart_id
-JOIN `user` u ON c.user_id = u.user_id 
-WHERE u.user_id = 492;
--- WHERE CONCAT(u.first_name, " ", u.last_name) = "Lori Hunt";
-
+-- ========================================================================================================= --
+/* 3.2.1 Assuming that you logged in as “Lori Hunt” (or user id 492), and you want to process the payment of all products in his cart.
+Note that the result should show the product_name, quantity ordered, and discount price.
+*/
+SELECT
+	product_name,
+    quantity AS quantity_ordered,
+    standard_price * quantity AS total_price
+FROM product_cart_map pc
+JOIN product p ON pc.product_id = p.product_id
+WHERE cart_id = 492;
 
 -- 3.2.2 Continue from 3.2.1., in this query return the summation of the price he needs to pay in total (Hint: Summation of 3.2.1.)
-SELECT SUM(pm.quantity * p.standard_price) AS total
-FROM product p
-JOIN product_cart_map pm ON p.product_id = pm.product_id
-JOIN cart c ON c.cart_id = pm.cart_id
-JOIN `user` u ON c.user_id = u.user_id 
-WHERE u.user_id = 492;
--- WHERE CONCAT(u.first_name, " ", u.last_name) = "Lori Hunt";
-
-SELECT * FROM `user` u WHERE CONCAT(u.first_name, " ", u.last_name) = "Lori Hunt";
+SELECT
+    SUM(standard_price * quantity) AS total_price
+FROM product_cart_map pc
+JOIN product p ON pc.product_id = p.product_id
+WHERE cart_id = 492;

@@ -241,12 +241,14 @@ SELECT * FROM USER WHERE email = "arel.Gomer@hotmail.com" AND password = "abcdef
 -- 2.3 See the order history of each customer
 -- 2.3.1 Assuming that you logged in as “Tina Walker”, and you want to see the number of transaction statuses (Completed, Ongoing, Failed) 
 -- sorted by the highest count. For instance, Completed 10 orders, Ongoing 3 orders, and Failed 2 orders.
-SELECT od.transaction_status, COUNT(transaction_status) AS TotalStatus FROM `order` o 
+SELECT od.order_detail_id, oi.order_item_id, p.product_name, oi.quantity, p.price * oi.quantity AS total_price FROM `order` o 
+JOIN order_item oi ON o.order_item_id = oi.order_item_id
 JOIN order_detail od ON o.order_detail_id = od.order_detail_id
+JOIN product p ON o.product_id = p.product_id
 JOIN `user` u ON o.user_id = u.user_id 
-WHERE CONCAT(u.first_name, " ", u.last_name) = "Tina Walker" 
-GROUP BY od.transaction_status
-ORDER BY transaction_status DESC;
+-- WHERE CONCAT(u.first_name, " ", u.last_name) = "Tina Walker" 
+WHERE u.user_id = 237 And od.transaction_status = "Failed"
+ORDER BY od.created_at;
 
 -- 2.3.2 List all of the order history where the transaction status is equal to “Failed”.
 SELECT od.transaction_status, COUNT(transaction_status) AS TotalStatus FROM `order` o 

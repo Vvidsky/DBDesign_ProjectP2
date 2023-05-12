@@ -48,7 +48,7 @@ CREATE TABLE `Product_vendor_map` (
     discount			decimal(10, 2),
     
     PRIMARY KEY (product_id, vendor_id),
-    FOREIGN KEY (product_id) REFERENCES Product(product_id),
+    FOREIGN KEY (product_id) REFERENCES Product(product_id), 
     FOREIGN KEY (vendor_id) REFERENCES Product_vendor(vendor_id)
 );
 

@@ -1,18 +1,25 @@
 /*-----------------------
 |		 Product		|
 -------------------------*/
+-- NOTED that the standard_price is not the price that will be included in the order_item
+-- the actual price will be derived from the discount_price in the product_vendor_map table
+-- Standard price will help us to understand the query functions while the real result will need to 
+-- JOIN the table on product_vendor_map with order_item ON both product_id and vendor_id.
+
 -- 1.1 Show the lists of products with their details
 -- 1.1.1 Show the list of products and their details whose product name includes the word "Panasonic".
 SELECT
 	product_name,
     product_description,
     product_thumbnail,
-    price,
-	(price - discount) AS discount_price,
-    ROUND(discount/price*100, 2) AS discount_percentage
-FROM product
-WHERE product_name LIKE "%Panasonic%"
-GROUP BY product_id;
+    pv.vendor_name,
+    pvm.price,
+	pvm.discount_price,
+    100-ROUND(discount_price/price*100, 2) AS discount_percentage
+FROM product p
+JOIN product_vendor_map pvm ON pvm.product_id = p.product_id
+JOIN product_vendor pv ON pvm.vendor_id = pv.vendor_id
+WHERE product_name LIKE "%Panasonic%";
 
 -- 1.1.2 Continue from 1.1.1, Show the rating score and helpful_rate_count of those products and sorted by weighting rating score and helpful_rate_count in descending order.
 -- HINT: To weight the rating score, rating_star * helpful_rate_count
@@ -30,11 +37,12 @@ ORDER BY (avg_rating_star * avg_helpful_rate_count) DESC;
 SELECT
 	product_name,
     product_description,
-    price,
-	(price - discount) AS discount_price,
-    ROUND(discount/price*100, 2) AS discount_percentage,
+    pvm.price,
+	pvm.discount_price,
+    100-ROUND(discount_price/price*100, 2) AS discount_percentage,
     sub_category_name
 FROM product p
+JOIN product_vendor_map pvm ON pvm.product_id = p.product_id
 INNER JOIN product_sub_category_map psm ON p.product_id = psm.product_id
 INNER JOIN product_sub_category ps ON psm.sub_category_id = ps.sub_category_id
 WHERE brand = "LG" OR "Blue Star" AND sub_category_name = "Air Conditioners";
@@ -43,12 +51,13 @@ WHERE brand = "LG" OR "Blue Star" AND sub_category_name = "Air Conditioners";
 SELECT
 	product_name,
     product_description,
-    price,
-	(price - discount) AS discount_price,
-    ROUND(discount/price*100, 2) AS discount_percentage
-FROM product
-WHERE (price - discount) BETWEEN 100 AND 300
-ORDER BY (price - discount) ASC;
+    pvm.price,
+	pvm.discount_price,
+    100-ROUND(discount_price/price*100, 2) AS discount_percentage
+FROM product p
+JOIN product_vendor_map pvm ON pvm.product_id = p.product_id
+WHERE discount_price BETWEEN 100 AND 300
+ORDER BY discount_price ASC;
 
 -- 1.1.5 Show the product name and their details where their created and modified date is within the year 2022.
 SELECT
@@ -65,7 +74,7 @@ WHERE YEAR(modified_at) = 2022;
          Brand: Lambs & Ivy
 */
 SET @max_product_id = (SELECT MAX(product_id) FROM product);
-INSERT INTO product(product_id, product_name, product_description, product_thumbnail, price, brand)
+INSERT INTO product(product_id, product_name, product_description, product_thumbnail, standard_price, brand)
 VALUES(@max_product_id + 1, "Elephant Stuffed Animal Toy Plushie", "Fluffy toy", 'https://m.media-amazon.com/images/I/41lrtqXPiWL._AC_UL399_.jpg', 23.50, "Lambs & Ivy");
 
 -- 1.2.2 Edit the brand name of all records where the brand is equal to "TOSHIBA" to "Toshiba".
@@ -89,7 +98,7 @@ BEGIN
     ) THEN
 		DELETE FROM product WHERE product_id = delete_product_id;
         DELETE FROM product_vendor_map WHERE product_id = delete_product_id;
-        DELETE FROM `order` WHERE product_id = delete_product_id;
+        DELETE FROM order_item WHERE product_id = delete_product_id;
 		DELETE FROM product_department_map WHERE product_id = delete_product_id;
         DELETE FROM product_cart_map WHERE product_id = delete_product_id;
         DELETE FROM product_sub_category_map WHERE product_id = delete_product_id;
@@ -144,7 +153,7 @@ BEGIN
     ) THEN
         DELETE FROM product_vendor WHERE vendor_id = delete_vendor_id;
         DELETE FROM product_vendor_map WHERE vendor_id = delete_vendor_id;
-        DELETE FROM `order` WHERE vendor_id = delete_vendor_id;
+        DELETE FROM order_item WHERE vendor_id = delete_vendor_id;
         DELETE FROM vendor_address WHERE vendor_id = delete_vendor_id;
         RETURN 1;
     ELSE
@@ -235,24 +244,36 @@ SELECT * FROM user;
 
 -- 2.2 Login
 -- Correct Login
-SELECT * FROM USER WHERE email = "arel.Gomer@hotmail.com" AND password = "JxQ0G3j";
+SELECT * FROM USER WHERE email = "kulawut.mak@gmail.com" AND password = "EaFgHyWbv";
 -- Incorrect password
-SELECT * FROM USER WHERE email = "arel.Gomer@hotmail.com" AND password = "abcdef";
+SELECT * FROM USER WHERE email = "kulawut.mak@gmail.com" AND password = "EaFgHyWbcccc1111";
 
 -- 2.3 See the order history of each customer
 -- 2.3.1 Assuming that you logged in as “Tina Walker”, and you want to see the number of transaction statuses (Completed, Ongoing, Failed) 
 -- sorted by the highest count. For instance, Completed 10 orders, Ongoing 3 orders, and Failed 2 orders.
-SELECT od.order_detail_id, oi.order_item_id, p.product_name, oi.quantity, p.price * oi.quantity AS total_price FROM `order` o 
-JOIN order_item oi ON o.order_item_id = oi.order_item_id
-JOIN order_detail od ON o.order_detail_id = od.order_detail_id
-JOIN product p ON o.product_id = p.product_id
-JOIN `user` u ON o.user_id = u.user_id 
+-- This query is just for understanding on what we are trying to implement. Since a product can be sold by many vendors, the acutal query
+-- will need to associate with product_vendor map table, see the query below.
+SELECT od.order_detail_id, oi.order_item_id, p.product_name, oi.quantity, p.standard_price * oi.quantity AS total_price FROM order_item oi
+JOIN order_detail od ON oi.order_detail_id = od.order_detail_id
+JOIN product p ON oi.product_id = p.product_id
+JOIN `user` u ON oi.user_id = u.user_id 
+-- WHERE CONCAT(u.first_name, " ", u.last_name) = "Tina Walker" 
+WHERE u.user_id = 237 And od.transaction_status = "Failed"
+ORDER BY od.created_at;
+
+-- The real query. Our generated data is not linking in the real world situation. In the real use, the price and vendor_id in the order_item will be derived
+-- from the product_vendor, so these data will be the same.
+SELECT od.order_detail_id, oi.order_item_id, p.product_name, oi.quantity, pvm.discount_price * oi.quantity AS total_price FROM order_item oi
+JOIN order_detail od ON oi.order_detail_id = od.order_detail_id
+JOIN product p ON oi.product_id = p.product_id
+JOIN product_vendor_map pvm ON pvm.product_id = p.product_id AND pvm.vendor_id = oi.vendor_id
+JOIN `user` u ON oi.user_id = u.user_id 
 -- WHERE CONCAT(u.first_name, " ", u.last_name) = "Tina Walker" 
 WHERE u.user_id = 237 And od.transaction_status = "Failed"
 ORDER BY od.created_at;
 
 -- 2.3.2 List all of the order history where the transaction status is equal to “Failed”.
-SELECT od.transaction_status, COUNT(transaction_status) AS TotalStatus FROM `order` o 
+SELECT od.transaction_status, COUNT(transaction_status) AS TotalStatus FROM order_item o
 JOIN order_detail od ON o.order_detail_id = od.order_detail_id
 JOIN `user` u ON o.user_id = u.user_id 
 WHERE u.user_id = 237 And od.transaction_status = "Failed"
@@ -267,7 +288,7 @@ ORDER BY transaction_status;
 -- 3.1 Add product to the cart
 
 -- 3.2.1 Assuming that you logged in as “Lori Hunt”, and you want to process the payment of all products in his cart. Note that the result should show the product_name, quantity ordered, and price (each).
-SELECT p.product_name, pm.quantity, p.price
+SELECT p.product_name, pm.quantity, p.standard_price
 FROM product p
 JOIN product_cart_map pm ON p.product_id = pm.product_id
 JOIN cart c ON c.cart_id = pm.cart_id
@@ -277,7 +298,7 @@ WHERE u.user_id = 492;
 
 
 -- 3.2.2 Continue from 3.2.1., in this query return the summation of the price he needs to pay in total (Hint: Summation of 3.2.1.)
-SELECT SUM(pm.quantity * p.price) AS total
+SELECT SUM(pm.quantity * p.standard_price) AS total
 FROM product p
 JOIN product_cart_map pm ON p.product_id = pm.product_id
 JOIN cart c ON c.cart_id = pm.cart_id

@@ -8,6 +8,7 @@ CREATE TABLE `Product` (
     product_description 	text(1000) NOT NULL, 
     product_thumbnail		varchar(255) NOT NULL,
     brand					varchar(255),
+    standard_price			decimal(10, 2),
     dimension				varchar(255),
     created_at				datetime,
     modified_at				datetime
@@ -43,7 +44,7 @@ CREATE TABLE `Product_vendor_map` (
 	vendor_id			int,
     list_date			date,
     price				decimal(10, 2),
-    discount			decimal(10, 2),
+    discount_price		decimal(10, 2),
     
     PRIMARY KEY (product_id, vendor_id),
     FOREIGN KEY (product_id) REFERENCES Product(product_id), 

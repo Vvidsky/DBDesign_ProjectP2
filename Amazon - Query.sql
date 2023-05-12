@@ -186,13 +186,13 @@ SELECT delete_review(1);
 DROP TRIGGER IF EXISTS add_new_user;
 DELIMITER \\
 CREATE TRIGGER add_new_user
-AFTER INSERT ON `user`
+BEFORE INSERT ON `user`
 FOR EACH ROW
 BEGIN
 	DECLARE	chk_date	BOOLEAN;
     SET chk_date = (SELECT created_at FROM user WHERE user_id = NEW.user_id);
     IF(ISNULL(chk_date)) THEN
-		UPDATE user SET created_at = NOW() WHERE user_id = NEW.user_id;
+		SET NEW.created_at = NOW();
 	END IF;
 END; \\
 DELIMITER ;
@@ -207,4 +207,4 @@ INSERT INTO `user`(user_id, first_name, last_name, email, password)
 VALUES(@max_userid + 1, 'Kulawut', 'Makkamoltham', 'kulawut.mak@gmail.com', 'EaFgHyWbv');
 
 -- DELETE FROM user
--- WHERE user_id = '10001';
+-- SELECT * FROM user WHERE user_id = '10001';

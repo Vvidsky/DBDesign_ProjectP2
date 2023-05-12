@@ -3,7 +3,11 @@
 -------------------------*/
 
 -- 1.1 Show the list of products with their detail
+-- SELECT * FROM product_list WHERE product_name LIKE "%air conditioner%";
 SELECT * FROM product_list WHERE department_name = "appliances";
+SELECT * FROM product WHERE brand = "LG";
+-- SELECT * FROM product WHERE price < 200;
+-- SELECT * FROM product WHERE MATCH (product_name) AGAINST ("inverter");
 
 -- 1.2 Create/Edit/Delete the products
 -- INSERT INTO product VALUES

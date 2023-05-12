@@ -120,6 +120,13 @@ LOAD DATA
 	IGNORE 1 LINES;
 SELECT * FROM `order`;
 
+LOAD DATA 
+	INFILE "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/product_vendor_map.csv" INTO TABLE `product_vendor_map`
+	FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+	LINES TERMINATED BY '\r\n'
+	IGNORE 1 LINES;
+SELECT * FROM `product_vendor_map`;
+
 
 
 

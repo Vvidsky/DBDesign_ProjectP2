@@ -4,10 +4,10 @@ USE Amazon;
 
 CREATE TABLE `Product` (
 	product_id 				int PRIMARY KEY,
-    product_name 			varchar(255),
-    product_description 	text(1000), 
-    product_thumbnail		varchar(255),
-    price					decimal(10,2),
+    product_name 			varchar(255) NOT NULL,
+    product_description 	text(1000) NOT NULL, 
+    product_thumbnail		varchar(255) NOT NULL,
+    price					decimal(10,2) NOT NULL,
     discount				int,
     brand					varchar(255),
     dimension				varchar(255),
@@ -40,6 +40,18 @@ CREATE TABLE `Vendor_address`(
     FOREIGN KEY (vendor_id) REFERENCES Product_vendor(vendor_id)
 ) ENGINE=InnoDB;
 
+CREATE TABLE `Product_vendor_map` (
+	product_id			int,
+	vendor_id			int,
+    list_date			date,
+    price				decimal(10, 2),
+    discount			decimal(10, 2),
+    
+    PRIMARY KEY (product_id, vendor_id),
+    FOREIGN KEY (product_id) REFERENCES Product(product_id),
+    FOREIGN KEY (vendor_id) REFERENCES Product_vendor(vendor_id)
+);
+
 CREATE TABLE `User`(
 	user_id 		int PRIMARY KEY,
     first_name 		varchar(255) NOT NULL,
@@ -69,7 +81,7 @@ CREATE TABLE `User_address`(
 
 CREATE TABLE `Payment_method`(
 	payment_method_id	int,
-    payment_method_name	varchar(255),
+    payment_method_name	enum('Credit Card', 'Debit Card', 'Paypal', 'Venmo'),
     credit_card			varchar(19),		# Maximum number of card number length
     user_id				int,
     PRIMARY KEY (payment_method_id, user_id),
@@ -124,12 +136,14 @@ CREATE TABLE `Order`(
 	user_address_id	int,
     product_id		int,
     user_id			int,
+    vendor_id		int,
 	
 	CONSTRAINT fk_order_order_item_id FOREIGN KEY (order_item_id) REFERENCES Order_item(order_item_id), 
     CONSTRAINT fk_order_order_detail_id FOREIGN KEY (order_detail_id) REFERENCES Order_detail(order_detail_id),
     CONSTRAINT fk_order_user_address_id FOREIGN KEY (user_address_id) REFERENCES User_address(user_address_id),
     CONSTRAINT fk_order_product_id FOREIGN KEY (product_id) REFERENCES Product(product_id), 
-    CONSTRAINT fk_order_user_id FOREIGN KEY (user_id) REFERENCES `User`(user_id) 
+    CONSTRAINT fk_order_user_id FOREIGN KEY (user_id) REFERENCES `User`(user_id) ,
+	CONSTRAINT fk_order_vendor_id FOREIGN KEY (vendor_id) REFERENCES `Product_vendor`(vendor_id) 
 ) ENGINE=InnoDB;
 
 CREATE TABLE `Cart`(

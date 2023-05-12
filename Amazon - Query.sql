@@ -1,3 +1,6 @@
+/*-----------------------
+|		 Product		|
+-------------------------*/
 -- 1.1 Show the lists of products with their details
 -- 1.1.1 Show the list of products and their details whose product name includes the word "Panasonic".
 SELECT
@@ -133,21 +136,22 @@ CREATE FUNCTION delete_vendor(delete_vendor_id INTEGER)
 RETURNS INTEGER
 DETERMINISTIC
 BEGIN
-	SET SQL_SAFE_UPDATES = 0;
-	SET FOREIGN_KEY_CHECKS = 0;
-	IF EXISTS(
-		SELECT * FROM product
+    SET SQL_SAFE_UPDATES = 0;
+    SET FOREIGN_KEY_CHECKS = 0;
+    IF EXISTS(
+        SELECT * FROM product_vendor
         WHERE vendor_id = delete_vendor_id
     ) THEN
-		DELETE FROM product_vendor WHERE vendor_id = delete_vendor_id;
+        DELETE FROM product_vendor WHERE vendor_id = delete_vendor_id;
         DELETE FROM product_vendor_map WHERE vendor_id = delete_vendor_id;
-        DELETE FROM product WHERE vendor_id = delete_vendor_id;
-		RETURN 1;
-	ELSE
-		RETURN 0;
-	END IF;
-	SET SQL_SAFE_UPDATES = 1;
-	SET FOREIGN_KEY_CHECKS = 1;
+        DELETE FROM `order` WHERE vendor_id = delete_vendor_id;
+        DELETE FROM vendor_address WHERE vendor_id = delete_vendor_id;
+        RETURN 1;
+    ELSE
+        RETURN 0;
+    END IF;
+    SET SQL_SAFE_UPDATES = 1;
+    SET FOREIGN_KEY_CHECKS = 1;
 END; //
 DELIMITER ;
 SELECT delete_vendor(85);
@@ -198,8 +202,7 @@ END; \\
 DELIMITER ;
 
 /* 2.1.1 Assuming that Kulawut is a new user, and he wants to register for an account with the following details.
-         Firstname: Kulawut
-         Lastname:  Makkamoltham
+         First lastname: Kulawut Makkamoltham
          Email: kulawut.mak@gmail.com
          Password: EaFgHyWbv
 */
@@ -207,68 +210,79 @@ SET @max_userid = (SELECT MAX(user_id) FROM user);
 INSERT INTO `user`(user_id, first_name, last_name, email, password)
 VALUES(@max_userid + 1, 'Kulawut', 'Makkamoltham', 'kulawut.mak@gmail.com', 'EaFgHyWbv');
 
-/* 2.1.2 Assuming that Nearlyded is a new product vendor, and he wants to register for an account with the following details.
-         Vendor name: Nearlyded
-         Email: nearlyded@hotmail.com
-         Password: AfdFDrrE
-*/
-SET @max_vendorid = (SELECT MAX(vendor_id) FROM product_vendor);
-INSERT INTO product_vendor (vendor_id, vendor_name, email, password)
-VALUES(@max_vendorid + 1, 'Nearlyded', 'nearlyded@hotmail.com', 'AfdFDrrE');
+-- DELETE FROM user
+-- SELECT * FROM user WHERE user_id = '10001';
 
--- ========================================================================================================= --
--- 2.2.1 Assuming that you are Kulawut, and he wants to log in to his new account with the following details. Please show all of his information.
-SELECT *
-FROM user
-WHERE first_name = "kulawut";
+/*-----------------------
+|	   	  User		    |
+-------------------------*/
+-- 2.1 Register
+DROP PROCEDURE IF EXISTS `register_user`;
+DELIMITER //
+CREATE PROCEDURE `register_user` (IN first_name VARCHAR(255), IN last_name VARCHAR(255), IN email VARCHAR(255), IN password VARCHAR(255))
+BEGIN
+	DECLARE maxId INT;
+	SET maxId = IF((SELECT max(user_id) FROM user), (SELECT max(user_id) FROM user) + 1, 1);
+    INSERT INTO user (user_id, first_name, last_name, email, password, created_at) VALUES 
+    (maxId, first_name, last_name, email, password, current_time());
+END
+//
+DELIMITER ;
 
--- 2.2.2 Assuming that you are Nearlyded, and he wants to log in to his new account with the following details. Please show all of his information.
-SELECT *
-FROM product_vendor
-WHERE vendor_name = "Nearlyded";
+CALL register_user('Nobi', 'Nobita', 'nobi.nobi@gmail.com', 'atibon888!');
 
--- ========================================================================================================= --
--- 2.3.1 Assuming that you logged in as “Tina Walker”, and you want to see the number of transaction statuses (Completed, Ongoing, Failed) sorted by the highest count. For instance, Completed 10 orders, Ongoing 3 orders, and Failed 2 orders.
-SELECT transaction_status, COUNT(order_detail_id) AS count_transaction_status
-FROM user u
-JOIN order_detail od ON u.user_id = u.user_id
-WHERE CONCAT(first_name, ' ', last_name) = "Tina Walker"
-GROUP BY transaction_status
-ORDER BY count_transaction_status DESC;
+SELECT * FROM user;
 
--- 2.3.2 List all of the order history where the transaction status is equal to “Failed”, and see if which payment_type is the most frequently failed, sorted in descending order
-SELECT
-	payment_method_name,
-    count(pm.payment_method_id) AS count_payment_name
-FROM order_detail od
-JOIN payment_method pm ON od.payment_method_id = pm.payment_method_id
-WHERE transaction_status = "Failed"
-GROUP BY payment_method_name
-ORDER BY count_payment_name DESC;
+-- 2.2 Login
+-- Correct Login
+SELECT * FROM USER WHERE email = "arel.Gomer@hotmail.com" AND password = "JxQ0G3j";
+-- Incorrect password
+SELECT * FROM USER WHERE email = "arel.Gomer@hotmail.com" AND password = "abcdef";
 
--- ========================================================================================================= --
-/* 3.1.1 Assuming that you logged in as “Lori Hunt” (or user id 492), and you want to add product id 95 or
-“Hitachi SPLIT AC - 1.0 Ton HITACHI SHIZEN 3100S INVERTER - R32 - RAPG312HFEOZ1 (Gold)” to his cart for 99 items.
-*/
-INSERT INTO product_cart_map
-VALUES(95, 492, 99);
-/* 
+-- 2.3 See the order history of each customer
+-- 2.3.1 Assuming that you logged in as “Tina Walker”, and you want to see the number of transaction statuses (Completed, Ongoing, Failed) 
+-- sorted by the highest count. For instance, Completed 10 orders, Ongoing 3 orders, and Failed 2 orders.
+SELECT od.order_detail_id, oi.order_item_id, p.product_name, oi.quantity, p.price * oi.quantity AS total_price FROM `order` o 
+JOIN order_item oi ON o.order_item_id = oi.order_item_id
+JOIN order_detail od ON o.order_detail_id = od.order_detail_id
+JOIN product p ON o.product_id = p.product_id
+JOIN `user` u ON o.user_id = u.user_id 
+-- WHERE CONCAT(u.first_name, " ", u.last_name) = "Tina Walker" 
+WHERE u.user_id = 237 And od.transaction_status = "Failed"
+ORDER BY od.created_at;
 
--- ========================================================================================================= --
-/* 3.2.1 Assuming that you logged in as “Lori Hunt” (or user id 492), and you want to process the payment of all products in his cart.
-Note that the result should show the product_name, quantity ordered, and discount price.
-*/
-SELECT
-	product_name,
-    quantity AS quantity_ordered,
-    (price - discount) * quantity AS discount_price
-FROM product_cart_map pc
-JOIN product p ON pc.product_id = p.product_id
-WHERE cart_id = 492;
+-- 2.3.2 List all of the order history where the transaction status is equal to “Failed”.
+SELECT od.transaction_status, COUNT(transaction_status) AS TotalStatus FROM `order` o 
+JOIN order_detail od ON o.order_detail_id = od.order_detail_id
+JOIN `user` u ON o.user_id = u.user_id 
+WHERE u.user_id = 237 And od.transaction_status = "Failed"
+-- WHERE CONCAT(u.first_name, " ", u.last_name) = "Tina Walker" And od.transaction_status = "Failed"
+GROUP BY od.transaction_status
+ORDER BY transaction_status;
+
+
+/*-----------------------
+|	   	 Shopping    	|
+-------------------------*/
+-- 3.1 Add product to the cart
+
+-- 3.2.1 Assuming that you logged in as “Lori Hunt”, and you want to process the payment of all products in his cart. Note that the result should show the product_name, quantity ordered, and price (each).
+SELECT p.product_name, pm.quantity, p.price
+FROM product p
+JOIN product_cart_map pm ON p.product_id = pm.product_id
+JOIN cart c ON c.cart_id = pm.cart_id
+JOIN `user` u ON c.user_id = u.user_id 
+WHERE u.user_id = 492;
+-- WHERE CONCAT(u.first_name, " ", u.last_name) = "Lori Hunt";
+
 
 -- 3.2.2 Continue from 3.2.1., in this query return the summation of the price he needs to pay in total (Hint: Summation of 3.2.1.)
-SELECT
-    SUM((price - discount) * quantity) AS discount_price
-FROM product_cart_map pc
-JOIN product p ON pc.product_id = p.product_id
-WHERE cart_id = 492;
+SELECT SUM(pm.quantity * p.price) AS total
+FROM product p
+JOIN product_cart_map pm ON p.product_id = pm.product_id
+JOIN cart c ON c.cart_id = pm.cart_id
+JOIN `user` u ON c.user_id = u.user_id 
+WHERE u.user_id = 492;
+-- WHERE CONCAT(u.first_name, " ", u.last_name) = "Lori Hunt";
+
+SELECT * FROM `user` u WHERE CONCAT(u.first_name, " ", u.last_name) = "Lori Hunt";

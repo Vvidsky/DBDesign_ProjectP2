@@ -7,8 +7,6 @@ CREATE TABLE `Product` (
     product_name 			varchar(255) NOT NULL,
     product_description 	text(1000) NOT NULL, 
     product_thumbnail		varchar(255) NOT NULL,
-    price					decimal(10,2) NOT NULL,
-    discount				int,
     brand					varchar(255),
     dimension				varchar(255),
     created_at				datetime,
@@ -88,14 +86,6 @@ CREATE TABLE `Payment_method`(
     CONSTRAINT fk_payment_method_user_user_id FOREIGN KEY (user_id) REFERENCES User(user_id)
 ) ENGINE=InnoDB;
 
-CREATE TABLE `Order_item`(
-	order_item_id	int PRIMARY KEY,
-    quantity		int,
-    price_each		double,
-    created_at		datetime,
-    modified_at		datetime
-) ENGINE=InnoDB;
-
 CREATE TABLE `Order_detail`(
 	order_detail_id			int PRIMARY KEY,
     transaction_status		ENUM('Completed', 'Ongoing', 'Failed'),
@@ -108,7 +98,30 @@ CREATE TABLE `Order_detail`(
 	shipping_fee			decimal(10,2),
     tax_rate				decimal(10,2),
     user_id					int,
-	payment_method_id		int
+	payment_method_id		int,
+    
+    CONSTRAINT fk_order_detail_user_id FOREIGN KEY (user_id) REFERENCES `user`(user_id),
+    CONSTRAINT fk_order_detail_payment_method_id FOREIGN KEY (payment_method_id) REFERENCES payment_method(payment_method_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE `Order_item`(
+	order_item_id	int PRIMARY KEY,
+    quantity		int,
+    price_each		double,
+    created_at		datetime,
+    modified_at		datetime,
+    
+	order_detail_id	int NOT NULL,
+	user_address_id	int,
+    product_id		int,
+    user_id			int,
+    vendor_id		int,
+	
+    CONSTRAINT fk_order_order_detail_id FOREIGN KEY (order_detail_id) REFERENCES Order_detail(order_detail_id),
+    CONSTRAINT fk_order_user_address_id FOREIGN KEY (user_address_id) REFERENCES User_address(user_address_id),
+    CONSTRAINT fk_order_product_id FOREIGN KEY (product_id) REFERENCES Product(product_id), 
+    CONSTRAINT fk_order_user_id FOREIGN KEY (user_id) REFERENCES `User`(user_id) ,
+	CONSTRAINT fk_order_vendor_id FOREIGN KEY (vendor_id) REFERENCES `Product_vendor`(vendor_id) 
 ) ENGINE=InnoDB;
 
 CREATE TABLE `Review`(
@@ -128,22 +141,6 @@ CREATE TABLE `Review_image`(
     review_image	varchar(255),
     PRIMARY KEY (review_id, review_image),
     CONSTRAINT fk_review_image_review_id FOREIGN KEY (review_id) REFERENCES Review(review_id) 
-) ENGINE=InnoDB;
-
-CREATE TABLE `Order`(
-	order_item_id	int PRIMARY KEY,
-    order_detail_id	int NOT NULL,
-	user_address_id	int,
-    product_id		int,
-    user_id			int,
-    vendor_id		int,
-	
-	CONSTRAINT fk_order_order_item_id FOREIGN KEY (order_item_id) REFERENCES Order_item(order_item_id), 
-    CONSTRAINT fk_order_order_detail_id FOREIGN KEY (order_detail_id) REFERENCES Order_detail(order_detail_id),
-    CONSTRAINT fk_order_user_address_id FOREIGN KEY (user_address_id) REFERENCES User_address(user_address_id),
-    CONSTRAINT fk_order_product_id FOREIGN KEY (product_id) REFERENCES Product(product_id), 
-    CONSTRAINT fk_order_user_id FOREIGN KEY (user_id) REFERENCES `User`(user_id) ,
-	CONSTRAINT fk_order_vendor_id FOREIGN KEY (vendor_id) REFERENCES `Product_vendor`(vendor_id) 
 ) ENGINE=InnoDB;
 
 CREATE TABLE `Cart`(
@@ -197,3 +194,15 @@ CREATE TABLE `product_sub_category_map` (
     CONSTRAINT fk_product_sub_category_map_product_id FOREIGN KEY (product_id) REFERENCES Product(product_id),
     CONSTRAINT fk_product_sub_category_map_sub_category_id_id FOREIGN KEY (sub_category_id) REFERENCES Product_sub_category(sub_category_id)
 ) ENGINE=InnoDB;
+
+DROP PROCEDURE IF EXISTS `register_user`;
+DELIMITER //
+CREATE PROCEDURE `register_user` (IN first_name VARCHAR(255), IN last_name VARCHAR(255), IN email VARCHAR(255), IN password VARCHAR(255))
+BEGIN
+	DECLARE maxId INT;
+	SET maxId = IF((SELECT max(user_id) FROM user), (SELECT max(user_id) FROM user) + 1, 1);
+    INSERT INTO user (user_id, first_name, last_name, email, password) VALUES 
+    (maxId, first_name, last_name, email, password);
+END
+//
+DELIMITER ;

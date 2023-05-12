@@ -1,7 +1,3 @@
-/*-----------------------
-|		 Product		|
--------------------------*/
-
 -- 1.1 Show the list of products with their detail
 CREATE OR REPLACE VIEW `product_list` AS
 SELECT p.product_id, p.product_name, p.product_thumbnail, p.price, p.price-p.discount AS discount_price, ROUND(p.discount/p.price*100, 2) AS discount_percentage, ps.sub_category_name, pd.department_name
@@ -15,12 +11,23 @@ LIMIT 10000;
 CREATE OR REPLACE VIEW `order_history` AS
 SELECT p.product_name, oi.quantity, oi.price_each, od.order_detail_id, od.created_at AS `Ordered on`, payment_method_name, od.transaction_status
 FROM order_detail od
-JOIN `order` o ON o.order_detail_id = od.order_detail_id
-JOIN order_item oi ON oi.order_item_id = o.order_item_id
-JOIN product p ON p.product_id = o.product_id
+JOIN order_item oi ON od.order_detail_id = oi.order_detail_id
+JOIN `user` u ON u.user_id = oi.user_id
+JOIN product p ON p.product_id = oi.product_id
 JOIN payment_method pm ON od.payment_method_id = pm.payment_method_id
 ORDER BY od.order_detail_id
 LIMIT 100000;
+
+SELECT p.product_name, oi.quantity, oi.price_each, od.order_detail_id, od.created_at AS `Ordered on`, payment_method_name, od.transaction_status
+FROM order_detail od
+JOIN order_item oi ON od.order_detail_id = oi.order_detail_id
+JOIN `user` u ON u.user_id = oi.user_id
+JOIN product p ON p.product_id = oi.product_id
+JOIN payment_method pm ON od.payment_method_id = pm.payment_method_id
+ORDER BY od.order_detail_id
+LIMIT 100000;
+
+SELECT * FROM order_history;
 
 -- User Cart
 CREATE OR REPLACE VIEW `user_cart` AS

@@ -7,8 +7,5 @@ ALTER TABLE product ADD INDEX (standard_price);
 -- Review
 CREATE FULLTEXT INDEX fulltext_comment ON review(comment);
 
--- User
-CREATE INDEX authentication ON user(email, password);
-
 -- Product_vendor
 CREATE INDEX authentication ON Product_vendor(email, password);

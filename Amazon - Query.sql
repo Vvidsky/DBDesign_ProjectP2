@@ -1,6 +1,3 @@
-/*-----------------------
-|		 Product		|
--------------------------*/
 -- NOTED that the standard_price is not the price that will be included in the order_item
 -- the actual price will be derived from the discount_price in the product_vendor_map table
 -- Standard price will help us to understand the query functions while the real result will need to 
@@ -215,39 +212,35 @@ DELIMITER ;
          Email: kulawut.mak@gmail.com
          Password: EaFgHyWbv
 */
-SET @max_userid = (SELECT MAX(user_id) FROM user);
-INSERT INTO `user`(user_id, first_name, last_name, email, password)
-VALUES(@max_userid + 1, 'Kulawut', 'Makkamoltham', 'kulawut.mak@gmail.com', 'EaFgHyWbv');
+-- SET @max_userid = (SELECT MAX(user_id) FROM user);
+-- INSERT INTO `user`(user_id, first_name, last_name, email, password)
+-- VALUES(@max_userid + 1, 'Kulawut', 'Makkamoltham', 'kulawut.mak@gmail.com', 'EaFgHyWbv');
 
--- DELETE FROM user
--- SELECT * FROM user WHERE user_id = '10001';
+CALL register_user('Kulawut', 'Makkamoltham', 'kulawut.mak@gmail.com', 'EaFgHyWbv');
+/* 2.1.2 Assuming that Nearlyded is a new product vendor, and he wants to register for an account with the following details.
+         Vendor name: Nearlyded
+         Email: nearlyded@hotmail.com
+         Password: AfdFDrrE
+*/
+SET @max_vendorid = (SELECT MAX(vendor_id) FROM product_vendor);
+INSERT INTO product_vendor (vendor_id, vendor_name, email, password)
+VALUES(@max_vendorid + 1, 'Nearlyded', 'nearlyded@hotmail.com', 'AfdFDrrE');
 
-/*-----------------------
-|	   	  User		    |
--------------------------*/
--- 2.1 Register
-DROP PROCEDURE IF EXISTS `register_user`;
-DELIMITER //
-CREATE PROCEDURE `register_user` (IN first_name VARCHAR(255), IN last_name VARCHAR(255), IN email VARCHAR(255), IN password VARCHAR(255))
-BEGIN
-	DECLARE maxId INT;
-	SET maxId = IF((SELECT max(user_id) FROM user), (SELECT max(user_id) FROM user) + 1, 1);
-    INSERT INTO user (user_id, first_name, last_name, email, password, created_at) VALUES 
-    (maxId, first_name, last_name, email, password, current_time());
-END
-//
-DELIMITER ;
-
-CALL register_user('Nobi', 'Nobita', 'nobi.nobi@gmail.com', 'atibon888!');
-
-SELECT * FROM user;
-
--- 2.2 Login
+-- ========================================================================================================= --
+-- 2.2.1 Assuming that you are Kulawut, and he wants to log in to his new account with the following details. Please show all of his information.
 -- Correct Login
 SELECT * FROM USER WHERE email = "kulawut.mak@gmail.com" AND password = "EaFgHyWbv";
 -- Incorrect password
 SELECT * FROM USER WHERE email = "kulawut.mak@gmail.com" AND password = "EaFgHyWbcccc1111";
 
+-- 2.2.2 Assuming that you are Nearlyded, and he wants to log in to his new account with the following details. Please show all of his information.
+-- Correct Login
+SELECT * FROM product_vendor WHERE email = "nearlyded@hotmail.com" AND password = "AfdFDrrE";
+-- Incorrect password
+SELECT * FROM product_vendor WHERE email = "nearlyded@hotmail.com" AND password = "abcdef";
+
+
+-- ========================================================================================================= --
 -- 2.3 See the order history of each customer
 -- 2.3.1 Assuming that you logged in as “Tina Walker”, and you want to see the number of transaction statuses (Completed, Ongoing, Failed) 
 -- sorted by the highest count. For instance, Completed 10 orders, Ongoing 3 orders, and Failed 2 orders.

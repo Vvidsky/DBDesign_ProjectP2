@@ -254,7 +254,8 @@ ORDER BY od.created_at;
 SELECT od.transaction_status, COUNT(transaction_status) AS TotalStatus FROM `order` o 
 JOIN order_detail od ON o.order_detail_id = od.order_detail_id
 JOIN `user` u ON o.user_id = u.user_id 
-WHERE CONCAT(u.first_name, " ", u.last_name) = "Tina Walker" And od.transaction_status = "Failed"
+WHERE u.user_id = 237 And od.transaction_status = "Failed"
+-- WHERE CONCAT(u.first_name, " ", u.last_name) = "Tina Walker" And od.transaction_status = "Failed"
 GROUP BY od.transaction_status
 ORDER BY transaction_status;
 

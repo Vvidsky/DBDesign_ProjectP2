@@ -14,6 +14,3 @@ CREATE INDEX authentication ON user(email, password);
 
 -- Product_vendor
 CREATE INDEX authentication ON Product_vendor(email, password);
-
--- Order_detail
-CREATE INDEX transaction_status ON Order_detail(transaction_status);

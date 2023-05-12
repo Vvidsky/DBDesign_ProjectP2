@@ -3,6 +3,9 @@
 -- Standard price will help us to understand the query functions while the real result will need to 
 -- JOIN the table on product_vendor_map with order_item ON both product_id and vendor_id.
 
+/*----------------------------------
+|		 Query on Main table   		|
+-----------------------------------*/
 -- 1.1 Show the lists of products with their details
 -- 1.1.1 Show the list of products and their details whose product name includes the word "Panasonic".
 SELECT
@@ -89,6 +92,7 @@ FROM product
 WHERE YEAR(created_at) = 2022 AND YEAR(modified_at) = 2022;
     
 -- ========================================================================================================= --
+-- 1.2 Create/Edit/Delete the products
 /* 1.2.1 Create/Insert new product with the following details (other columns just leave it blank for now)
          Product name: Elephant Stuffed Animal Toy Plushie
          Product description: Fluffy toy
@@ -137,6 +141,7 @@ DELIMITER ;
 SELECT delete_product(2);
 
 -- ========================================================================================================= --
+-- 1.3 Write/Edit/Delete the review description and images of each product
 /* 1.3.1 User id 10 want to create the review to product id 430 with this following details
          Rating star: 5
          Comment: Good! Must have item
@@ -158,6 +163,7 @@ DELETE FROM review
 WHERE review_id = 25001;
 
 -- ========================================================================================================= --
+-- 1.4 Delete the product
 /* 1.4.1 Assuming that the product vendor “OceanOasis” (or vendor id 85) violates the set regulations of the company
 by selling the prohibited products. With this action, all of his product vendor information and
 any information related to him will be deleted.
@@ -189,6 +195,7 @@ DELIMITER ;
 SELECT delete_vendor(85);
 
 -- ========================================================================================================= --
+-- 1.5 Delete the review
 /* 1.5.1 Assuming that comment that review id 1 has a rude word on the comment and should be deleted.
 Therefore, you need to delete all of the reviews where it references to review id 1 to make
 the website cleaner.
@@ -218,6 +225,7 @@ DELIMITER ;
 SELECT delete_review(1);
 
 -- ========================================================================================================= --
+-- 2.1 Register
 /* Create trigger if it has new user inserted with no created_at, then use today date */
 DROP TRIGGER IF EXISTS add_new_user;
 DELIMITER \\
@@ -253,6 +261,7 @@ INSERT INTO product_vendor (vendor_id, vendor_name, email, password)
 VALUES(@max_vendorid + 1, 'Nearlyded', 'nearlyded@hotmail.com', 'AfdFDrrE');
 
 -- ========================================================================================================= --
+-- 2.2 Login
 -- 2.2.1 Assuming that you are Kulawut, and he wants to log in to his new account with the following details. Please show all of his information.
 -- Correct Login
 SELECT * FROM USER WHERE email = "kulawut.mak@gmail.com" AND password = "EaFgHyWbv";
@@ -302,6 +311,7 @@ ORDER BY transaction_status;
 
 
 -- ========================================================================================================= --
+-- 3.1 Add product to the cart
 /* 3.1.1 Assuming that you logged in as “Lori Hunt” (or user id 492), and you want to add product id 95 or
 “Hitachi SPLIT AC - 1.0 Ton HITACHI SHIZEN 3100S INVERTER - R32 - RAPG312HFEOZ1 (Gold)” to his cart for 99 items.
 */
@@ -310,6 +320,7 @@ VALUES(95, 492, 99);
 /* 
 
 -- ========================================================================================================= --
+-- 3.2 Process the payment
 /* 3.2.1 Assuming that you logged in as “Lori Hunt” (or user id 492), and you want to process the payment of all products in his cart.
 Note that the result should show the product_name, quantity ordered, and discount price.
 */
@@ -327,3 +338,61 @@ SELECT
 FROM product_cart_map pc
 JOIN product p ON pc.product_id = p.product_id
 WHERE cart_id = 492;
+
+-- =========================================================================================================
+-- =========================================================================================================
+-- NOTED that the view need to be created before running this query,
+-- this is the same queries as above, but it will query from the View instead of the main table
+/*-------------------------------
+|		 Query on View   		|
+--------------------------------*/
+-- 1.1.1 Show the list of products and their details whose product name includes the word "Panasonic".= Product table
+SELECT
+	product_name,
+    product_description,
+    product_thumbnail,
+    pvm.price,
+    pvm.price - pvm.discount_price AS discount_price,
+	ROUND(pvm.discount_price/pvm.price * 100, 2) AS discount_percentage
+FROM `product_list` pl
+JOIN product_vendor_map pvm ON pvm.product_id = pl.product_id
+WHERE product_name LIKE "%Panasonic%"
+GROUP BY pl.product_id;
+
+-- 1.1.2 Continue from 1.1.1, Show the rating score of those products and sorted rating_star in descending order. = Product table and Review table
+SELECT
+	product_name,
+    ROUND(AVG(r.rating_star), 2) AS avg_rating_star,
+    ROUND(AVG(r.helpful_rate_count), 2) AS avg_helpful_rate_count
+FROM `product_list` p
+INNER JOIN `review_list` r ON r.product_id = p.product_id
+WHERE product_name LIKE "%Panasonic%"
+GROUP BY p.product_id
+ORDER BY (avg_rating_star * avg_helpful_rate_count) DESC;
+
+-- 2.3.1 Assuming that you logged in as “Tina Walker”, and you want to see the number of transaction statuses (Completed, Ongoing, Failed) sorted by the highest count. For instance, Completed 10 orders, Ongoing 3 orders, and Failed 2 orders. = User table and Order_detail table
+SELECT transaction_status, COUNT(order_detail_id) AS count_transaction_status
+FROM `user_order`
+WHERE CONCAT(first_name, ' ', last_name) = "Tina Sievewright"
+GROUP BY transaction_status
+ORDER BY count_transaction_status DESC;
+
+-- 2.2.2 Assuming that you are Nearlyded, and he wants to log in to his new account with the following details. Please show all of his information. = Product_vendor table
+SELECT *
+FROM `product_vendor_list`
+WHERE vendor_name = "Nearlyded";
+
+-- 2.3.2 List all of the order history where the transaction status is equal to “Failed”. = Order_detail table and Payment_method table
+SELECT
+	payment_method_name,
+    count(payment_method_id) AS count_payment_name
+FROM `user_order`
+WHERE transaction_status = "Failed"
+GROUP BY payment_method_name
+ORDER BY count_payment_name DESC;
+
+-- 1.1.5 Show the product name and their details where their created and modified date is within the year 2022. = Product table
+SELECT
+	*
+FROM `product_list`
+WHERE YEAR(modified_at) = 2022;

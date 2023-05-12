@@ -7,16 +7,16 @@ SELECT
     p.product_name,
     p.product_description,
     p.product_thumbnail,
-    p.price,
-    p.discount,
-    p.price-p.discount AS discount_price,
-    ROUND(p.discount/p.price*100, 2) AS discount_percentage,
+    pvm.price,
+    pvm.price - pvm.discount_price AS discount_price,
+    ROUND(pvm.discount_price/pvm.price * 100, 2) AS discount_percentage,
     ps.sub_category_name,
     pd.department_name,
     p.modified_at
 FROM product p
 JOIN product_sub_category_map pm ON p.product_id = pm.product_id
 JOIN product_sub_category ps ON ps.sub_category_id = pm.sub_category_id
+JOIN product_vendor_map pvm ON pvm.product_id = p.product_id
 JOIN product_department pd ON pd.department_id = ps.department_id
 LIMIT 10000;
 SELECT * FROM `product_list`;

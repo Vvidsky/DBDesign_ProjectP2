@@ -18,6 +18,20 @@ JOIN product_vendor_map pvm ON pvm.product_id = p.product_id
 JOIN product_vendor pv ON pvm.vendor_id = pv.vendor_id
 WHERE product_name LIKE "%Panasonic%";
 
+-- 
+SELECT
+	product_name,
+    product_description,
+    product_thumbnail,
+    pv.vendor_name,
+    pvm.price,
+	pvm.discount_price,
+    100-ROUND(discount_price/price*100, 2) AS discount_percentage
+FROM product p
+JOIN product_vendor_map pvm ON pvm.product_id = p.product_id
+JOIN product_vendor pv ON pvm.vendor_id = pv.vendor_id
+WHERE MATCH(product_name) AGAINST ("Panasonic");
+
 -- 1.1.2 Continue from 1.1.1, Show the rating score and helpful_rate_count of those products and sorted by weighting rating score and helpful_rate_count in descending order.
 -- HINT: To weight the rating score, rating_star * helpful_rate_count
 SELECT
@@ -30,10 +44,22 @@ WHERE product_name LIKE "%Panasonic%"
 GROUP BY p.product_id
 ORDER BY (avg_rating_star * avg_helpful_rate_count) DESC;
 
+-- Using FULLTEXT index
+SELECT
+	product_name,
+    ROUND(AVG(r.rating_star), 2) AS avg_rating_star,
+    ROUND(AVG(r.helpful_rate_count), 2) AS avg_helpful_rate_count
+FROM product p
+INNER JOIN review r ON r.product_id = p.product_id
+WHERE MATCH(product_name) AGAINST ("Panasonic")
+GROUP BY p.product_id
+ORDER BY (avg_rating_star * avg_helpful_rate_count) DESC;
+
 -- 1.1.3 Show the list of products where the product brand is equal to "LG" or "Blue Star" and the sub category is "Air Conditioners" 
 SELECT
 	product_name,
     product_description,
+    brand,
     pvm.price,
 	pvm.discount_price,
     100-ROUND(discount_price/price*100, 2) AS discount_percentage,
@@ -42,7 +68,7 @@ FROM product p
 JOIN product_vendor_map pvm ON pvm.product_id = p.product_id
 INNER JOIN product_sub_category_map psm ON p.product_id = psm.product_id
 INNER JOIN product_sub_category ps ON psm.sub_category_id = ps.sub_category_id
-WHERE brand = "LG" OR "Blue Star" AND sub_category_name = "Air Conditioners";
+WHERE brand = "LG" OR brand = "Blue Star" AND sub_category_name = "Air Conditioners";
 
 -- 1.1.4 Show the list of Samsung products where the discount price is between 100 and 300 (Note that the discount price can be calculated by the price minus the discount column) and sorted the discount price by ascending order
 SELECT
@@ -56,11 +82,11 @@ JOIN product_vendor_map pvm ON pvm.product_id = p.product_id
 WHERE discount_price BETWEEN 100 AND 300
 ORDER BY discount_price ASC;
 
--- 1.1.5 Show the product name and their details where their created and modified date is within the year 2022.
+-- 1.1.5 Show the product name and their details where their created and modified date is in 2022.
 SELECT
 	*
 FROM product
-WHERE YEAR(modified_at) = 2022;
+WHERE YEAR(created_at) = 2022 AND YEAR(modified_at) = 2022;
     
 -- ========================================================================================================= --
 /* 1.2.1 Create/Insert new product with the following details (other columns just leave it blank for now)

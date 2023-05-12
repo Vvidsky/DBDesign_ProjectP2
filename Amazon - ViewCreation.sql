@@ -6,6 +6,7 @@ JOIN product p ON p.product_id = pvm.product_id
 JOIN product_sub_category_map pm ON p.product_id = pm.product_id
 JOIN product_sub_category ps ON ps.sub_category_id = pm.sub_category_id
 JOIN product_department pd ON pd.department_id = ps.department_id
+WHERE pd.department_id = 1
 LIMIT 10000;
 
 SELECT * FROM product_list;
@@ -18,6 +19,7 @@ JOIN order_item oi ON od.order_detail_id = oi.order_detail_id
 JOIN `user` u ON u.user_id = oi.user_id
 JOIN product p ON p.product_id = oi.product_id
 JOIN payment_method pm ON od.payment_method_id = pm.payment_method_id
+WHERE u.user_id = 5000
 ORDER BY od.order_detail_id
 LIMIT 100000;
 

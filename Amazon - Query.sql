@@ -352,6 +352,7 @@ WHERE product_name LIKE "%Panasonic%"
 GROUP BY p.product_id
 ORDER BY (avg_rating_star * avg_helpful_rate_count) DESC;
 
+-- 2.3.1 Assuming that you logged in as “Tina Walker, and you want to see the number of transaction statuses (Completed, Ongoing, Failed) sorted by the highest count. For instance, Completed 10 orders, Ongoing 3 orders, and Failed 2 orders. = User table and Order_detail table
 SELECT transaction_status, COUNT(order_detail_id) AS count_transaction_status
 FROM `user_order`
 WHERE CONCAT(first_name, ' ', last_name) = "Tina Walker"

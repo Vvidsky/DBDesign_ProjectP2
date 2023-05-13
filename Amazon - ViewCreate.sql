@@ -1,7 +1,7 @@
 /*-------------------------------
 |		 Product List View		|
 --------------------------------*/
--- Used by users and product vendors
+-- Used by Customer, Vendor, and Staff
 CREATE OR REPLACE VIEW `product_list` AS
 SELECT
 	p.product_id,
@@ -25,7 +25,7 @@ SELECT * FROM `product_list`;
 /*-------------------------------
 |		 Review_list View		|
 --------------------------------*/
--- Used by users and product vendors
+-- Used by Customer and Staff
 CREATE OR REPLACE VIEW `review_list` AS
 SELECT
 	r.review_id,
@@ -41,7 +41,7 @@ SELECT * FROM `review_list`;
 /*-------------------------------
 |		 User_order View		|
 --------------------------------*/
--- Used by users and product vendors
+-- Used by User
 CREATE OR REPLACE VIEW `user_order` AS
 SELECT
 	u.user_id,
@@ -68,7 +68,7 @@ SELECT * FROM `user_order`;
 /*-----------------------------------
 |		 Product_vendor View		|
 ------------------------------------*/
--- Used by staffs
+-- Used by Vendor
 CREATE OR REPLACE VIEW `product_vendor_list` AS
 SELECT 
 	pv.vendor_id, 

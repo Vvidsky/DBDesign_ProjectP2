@@ -276,7 +276,8 @@ SELECT * FROM product_vendor WHERE email = "nearlyded@hotmail.com" AND password 
 
 
 -- ========================================================================================================= --
--- 2.3.1 Assuming that you logged in as “Tina Walker”, and you want to see the number of transaction statuses (Completed, Ongoing, Failed) sorted by the highest count. For instance, Completed 10 orders, Ongoing 3 orders, and Failed 2 orders.
+-- 2.3.1 Assuming that you logged in as “Tina Walker, and you want to see the number of transaction statuses (Completed, Ongoing, Failed) 
+-- sorted by the highest count. For instance, Completed 10 orders, Ongoing 3 orders, and Failed 2 orders. = User table and Order_detail table
 SELECT transaction_status, COUNT(order_detail_id) AS count_transaction_status
 FROM order_detail od
 WHERE user_id = 237

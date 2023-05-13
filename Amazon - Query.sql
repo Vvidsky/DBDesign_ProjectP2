@@ -21,7 +21,7 @@ JOIN product_vendor_map pvm ON pvm.product_id = p.product_id
 JOIN product_vendor pv ON pvm.vendor_id = pv.vendor_id
 WHERE product_name LIKE "%Panasonic%";
 
--- 
+-- Using FULLTEXT index
 SELECT
 	product_name,
     product_description,

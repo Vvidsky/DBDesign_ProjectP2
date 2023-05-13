@@ -1,6 +1,7 @@
 /*-------------------------------
-|		 Product_list View		|
+|		 Product List View		|
 --------------------------------*/
+-- Used by users and product vendors
 CREATE OR REPLACE VIEW `product_list` AS
 SELECT
 	p.product_id,
@@ -24,6 +25,7 @@ SELECT * FROM `product_list`;
 /*-------------------------------
 |		 Review_list View		|
 --------------------------------*/
+-- Used by users and product vendors
 CREATE OR REPLACE VIEW `review_list` AS
 SELECT
 	r.review_id,
@@ -39,6 +41,7 @@ SELECT * FROM `review_list`;
 /*-------------------------------
 |		 User_order View		|
 --------------------------------*/
+-- Used by users and product vendors
 CREATE OR REPLACE VIEW `user_order` AS
 SELECT
 	u.user_id,
@@ -47,21 +50,40 @@ SELECT
     is_prime_member,
     email,
     password,
-    order_detail_id,
+    od.order_detail_id,
+    oi.order_item_id,
+    p.product_name,
     transaction_status,
     payment_date,
     pm.payment_method_id,
 	payment_method_name
 FROM user u
 JOIN order_detail od ON u.user_id = od.user_id
-JOIN payment_method pm ON u.user_id = pm.user_id;
-SELECT * FROM `user_order`;
+RIGHT JOIN order_item oi ON oi.order_detail_id = od.order_detail_id
+JOIN product p ON p.product_id = oi.product_id
+JOIN payment_method pm ON od.payment_method_id = pm.payment_method_id;
+
+-- Example Usage: Get the order history of the user and the order_item in the order
+SELECT * FROM `user_order` WHERE user_id = 2;
 
 /*-----------------------------------
 |		 Product_vendor View		|
 ------------------------------------*/
+-- Used by staffs
 CREATE OR REPLACE VIEW `product_vendor_list` AS
-SELECT
-	*
-FROM product_vendor;
+SELECT 
+	pv.vendor_id, 
+	pv.vendor_description,
+    pv.business_domain,
+    pv.thumbnail_profile,
+    pv.email,
+    pv.phone_number,
+    pv.is_verified,
+    va.street,
+    va.city,
+    va.zipcode,
+    va.country,
+    va.home_phone
+FROM product_vendor pv
+JOIN vendor_address va ON pv.vendor_id = va.vendor_id;
 SELECT * FROM `product_vendor_list`;

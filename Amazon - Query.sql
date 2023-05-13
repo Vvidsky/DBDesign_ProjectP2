@@ -276,38 +276,22 @@ SELECT * FROM product_vendor WHERE email = "nearlyded@hotmail.com" AND password 
 
 
 -- ========================================================================================================= --
--- 2.3 See the order history of each customer
--- 2.3.1 Assuming that you logged in as “Tina Walker”, and you want to see the number of transaction statuses (Completed, Ongoing, Failed) 
--- sorted by the highest count. For instance, Completed 10 orders, Ongoing 3 orders, and Failed 2 orders.
--- This query is just for understanding on what we are trying to implement. Since a product can be sold by many vendors, the acutal query
--- will need to associate with product_vendor map table, see the query below.
-SELECT od.order_detail_id, oi.order_item_id, p.product_name, oi.quantity, p.standard_price * oi.quantity AS total_price FROM order_item oi
-JOIN order_detail od ON oi.order_detail_id = od.order_detail_id
-JOIN product p ON oi.product_id = p.product_id
-JOIN `user` u ON oi.user_id = u.user_id 
--- WHERE CONCAT(u.first_name, " ", u.last_name) = "Tina Walker" 
-WHERE u.user_id = 237 And od.transaction_status = "Failed"
-ORDER BY od.created_at;
+-- 2.3.1 Assuming that you logged in as “Tina Walker”, and you want to see the number of transaction statuses (Completed, Ongoing, Failed) sorted by the highest count. For instance, Completed 10 orders, Ongoing 3 orders, and Failed 2 orders.
+SELECT transaction_status, COUNT(order_detail_id) AS count_transaction_status
+FROM order_detail od
+WHERE user_id = 237
+GROUP BY transaction_status
+ORDER BY count_transaction_status DESC;
 
--- The real query. Our generated data is not linking in the real world situation. In the real use, the price and vendor_id in the order_item will be derived
--- from the product_vendor, so these data will be the same.
-SELECT od.order_detail_id, oi.order_item_id, p.product_name, oi.quantity, pvm.discount_price * oi.quantity AS total_price FROM order_item oi
-JOIN order_detail od ON oi.order_detail_id = od.order_detail_id
-JOIN product p ON oi.product_id = p.product_id
-JOIN product_vendor_map pvm ON pvm.product_id = p.product_id AND pvm.vendor_id = oi.vendor_id
-JOIN `user` u ON oi.user_id = u.user_id 
--- WHERE CONCAT(u.first_name, " ", u.last_name) = "Tina Walker" 
-WHERE u.user_id = 237 And od.transaction_status = "Failed"
-ORDER BY od.created_at;
-
--- 2.3.2 List all of the order history where the transaction status is equal to “Failed”.
-SELECT od.transaction_status, COUNT(transaction_status) AS TotalStatus FROM order_item o
-JOIN order_detail od ON o.order_detail_id = od.order_detail_id
-JOIN `user` u ON o.user_id = u.user_id 
-WHERE u.user_id = 237 And od.transaction_status = "Failed"
--- WHERE CONCAT(u.first_name, " ", u.last_name) = "Tina Walker" And od.transaction_status = "Failed"
-GROUP BY od.transaction_status
-ORDER BY transaction_status;
+-- 2.3.2 List all of the order history where the transaction status is equal to “Failed”, and see if which payment_type is the most frequently failed, sorted in descending order
+SELECT
+	payment_method_name,
+    count(pm.payment_method_id) AS count_payment_name
+FROM order_detail od
+JOIN payment_method pm ON od.payment_method_id = pm.payment_method_id
+WHERE transaction_status = "Failed"
+GROUP BY payment_method_name
+ORDER BY count_payment_name DESC;
 
 
 -- ========================================================================================================= --
@@ -351,13 +335,11 @@ SELECT
 	product_name,
     product_description,
     product_thumbnail,
-    pvm.price,
-    pvm.price - pvm.discount_price AS discount_price,
-	ROUND(pvm.discount_price/pvm.price * 100, 2) AS discount_percentage
+    price,
+    discount_price,
+	100-ROUND(discount_price/price * 100, 2) AS discount_percentage
 FROM `product_list` pl
-JOIN product_vendor_map pvm ON pvm.product_id = pl.product_id
-WHERE product_name LIKE "%Panasonic%"
-GROUP BY pl.product_id;
+WHERE product_name LIKE "%Panasonic%";
 
 -- 1.1.2 Continue from 1.1.1, Show the rating score of those products and sorted rating_star in descending order. = Product table and Review table
 SELECT
@@ -380,7 +362,7 @@ ORDER BY count_transaction_status DESC;
 -- 2.2.2 Assuming that you are Nearlyded, and he wants to log in to his new account with the following details. Please show all of his information. = Product_vendor table
 SELECT *
 FROM `product_vendor_list`
-WHERE vendor_name = "Nearlyded";
+WHERE email = "nearlyded@hotmail.com" AND password = "AfdFDrrE";
 
 -- 2.3.2 List all of the order history where the transaction status is equal to “Failed”. = Order_detail table and Payment_method table
 SELECT
